@@ -40,4 +40,25 @@ public class TicketsController : ControllerBase
             new { id = ticket.TicketId },
             ticket);
     }
+
+    [HttpPut("{id}/status")]
+    public async Task<ActionResult<TicketResponse>> ChangeStatus(
+        int id,
+        ChangeTicketStatusRequest request)
+    {
+        try
+        {
+            var ticket = await _ticketService.ChangeStatusAsync(id, request);
+
+            return Ok(ticket);
+        }
+        catch (KeyNotFoundException exception)
+        {
+            return NotFound(exception.Message);
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+    }
 }
