@@ -1,0 +1,161 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #f4f6f8;
+  font-family: Arial, sans-serif;
+  color: #1f2937;
+}
+
+.header {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 20px 32px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.header p {
+  margin: 5px 0 0;
+  color: #6b7280;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 24px;
+  padding: 24px;
+}
+
+.ticket-form {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  height: fit-content;
+}
+
+.ticket-form h2 {
+  margin-top: 0;
+}
+
+.ticket-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ticket-form label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ticket-form input,
+.ticket-form textarea {
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font: inherit;
+}
+
+.ticket-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.ticket-form button {
+  margin-top: 8px;
+  padding: 11px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.ticket-form button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.column {
+  background: #e9edf2;
+  border-radius: 10px;
+  padding: 14px;
+  min-height: 400px;
+}
+
+.column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.column-header h2 {
+  font-size: 17px;
+  margin: 0 0 14px;
+}
+
+.column-header span {
+  background: white;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.ticket-card {
+  background: white;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.ticket-card strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.ticket-card span {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.ticket-card p {
+  margin-bottom: 0;
+  font-size: 14px;
+}
+
+.diagnosis {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 10px;
+}
+
+.empty {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 14px;
+  margin-top: 30px;
+}
+
+.error {
+  color: #b91c1c;
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+
+  .board {
+    grid-template-columns: 1fr;
+  }
+}
