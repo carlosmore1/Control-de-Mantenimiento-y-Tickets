@@ -26,8 +26,12 @@ export class App implements OnInit {
     description: ''
   };
 
+  statusComments: Record<number, string> = {};
+  diagnoses: Record<number, string> = {};
+
   errorMessage = '';
   isLoading = false;
+  updatingTicketId: number | null = null;
 
   constructor(
     private ticketService: TicketService,
@@ -85,7 +89,6 @@ export class App implements OnInit {
 
     this.ticketService.createTicket(this.newTicket).subscribe({
       next: ticket => {
-        // Add the new ticket immediately without making another GET request.
         this.tickets = [ticket, ...this.tickets];
 
         this.newTicket = {
@@ -95,15 +98,85 @@ export class App implements OnInit {
         };
 
         this.isLoading = false;
-
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
         this.errorMessage = 'Could not create the ticket.';
         this.isLoading = false;
-
         this.changeDetectorRef.markForCheck();
       }
     });
+  }
+
+  startProgress(ticket: Ticket): void {
+    this.errorMessage = '';
+    this.updatingTicketId = ticket.ticketId;
+
+    this.ticketService.changeStatus(ticket.ticketId, {
+      newStatus: 'InProgress',
+      comment: this.statusComments[ticket.ticketId] || undefined
+    }).subscribe({
+      next: updatedTicket => {
+        this.replaceTicket(updatedTicket);
+        this.statusComments[ticket.ticketId] = '';
+        this.updatingTicketId = null;
+        this.changeDetectorRef.markForCheck();
+      },
+      error: error => {
+        this.errorMessage = this.getErrorMessage(error);
+        this.updatingTicketId = null;
+        this.changeDetectorRef.markForCheck();
+      }
+    });
+  }
+
+  resolveTicket(ticket: Ticket): void {
+    this.errorMessage = '';
+
+    const diagnosis = this.diagnoses[ticket.ticketId]?.trim();
+
+    if (!diagnosis) {
+      this.errorMessage = 'A diagnosis is required to resolve the ticket.';
+      return;
+    }
+
+    this.updatingTicketId = ticket.ticketId;
+
+    this.ticketService.changeStatus(ticket.ticketId, {
+      newStatus: 'Resolved',
+      comment: this.statusComments[ticket.ticketId] || undefined,
+      diagnosis
+    }).subscribe({
+      next: updatedTicket => {
+        this.replaceTicket(updatedTicket);
+
+        this.statusComments[ticket.ticketId] = '';
+        this.diagnoses[ticket.ticketId] = '';
+
+        this.updatingTicketId = null;
+        this.changeDetectorRef.markForCheck();
+      },
+      error: error => {
+        this.errorMessage = this.getErrorMessage(error);
+        this.updatingTicketId = null;
+        this.changeDetectorRef.markForCheck();
+      }
+    });
+  }
+
+  private replaceTicket(updatedTicket: Ticket): void {
+    this.tickets = this.tickets.map(ticket =>
+      ticket.ticketId === updatedTicket.ticketId
+        ? updatedTicket
+        : ticket
+    );
+  }
+
+  private getErrorMessage(error: any): string {
+    if (typeof error?.error === 'string') {
+      return error.error;
+    }
+
+    return 'Could not update the ticket.';
   }
 }

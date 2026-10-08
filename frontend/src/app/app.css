@@ -159,3 +159,59 @@
     grid-template-columns: 1fr;
   }
 }
+.small-textarea {
+  width: 100%;
+  min-height: 65px;
+  box-sizing: border-box;
+  margin-top: 10px;
+  padding: 9px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  resize: vertical;
+  font: inherit;
+  font-size: 13px;
+}
+
+.card-label {
+  display: block;
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.action-button,
+.resolve-button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 9px;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.action-button {
+  background: #2563eb;
+}
+
+.resolve-button {
+  background: #15803d;
+}
+
+.action-button:disabled,
+.resolve-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.message-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #b91c1c;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 6px;
+}

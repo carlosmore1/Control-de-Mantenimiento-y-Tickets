@@ -38,10 +38,6 @@
         placeholder="Describe the incident"
       ></textarea>
 
-      <p class="error" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </p>
-
       <button type="submit" [disabled]="isLoading">
         {{ isLoading ? 'Creating...' : 'Create Ticket' }}
       </button>
@@ -51,16 +47,40 @@
 
   <section class="board">
 
+    <!-- PENDING -->
     <div class="column">
       <div class="column-header">
         <h2>Pending</h2>
         <span>{{ pendingTickets.length }}</span>
       </div>
 
-      <article class="ticket-card" *ngFor="let ticket of pendingTickets">
+      <article
+        class="ticket-card"
+        *ngFor="let ticket of pendingTickets"
+      >
         <strong>{{ ticket.title }}</strong>
         <span>{{ ticket.asset }}</span>
+
         <p>{{ ticket.description }}</p>
+
+        <textarea
+          class="small-textarea"
+          [(ngModel)]="statusComments[ticket.ticketId]"
+          placeholder="Comment (optional)"
+        ></textarea>
+
+        <button
+          class="action-button"
+          type="button"
+          [disabled]="updatingTicketId === ticket.ticketId"
+          (click)="startProgress(ticket)"
+        >
+          {{
+            updatingTicketId === ticket.ticketId
+              ? 'Updating...'
+              : 'Start Progress'
+          }}
+        </button>
       </article>
 
       <p class="empty" *ngIf="pendingTickets.length === 0">
@@ -68,16 +88,48 @@
       </p>
     </div>
 
+    <!-- IN PROGRESS -->
     <div class="column">
       <div class="column-header">
         <h2>In Progress</h2>
         <span>{{ inProgressTickets.length }}</span>
       </div>
 
-      <article class="ticket-card" *ngFor="let ticket of inProgressTickets">
+      <article
+        class="ticket-card"
+        *ngFor="let ticket of inProgressTickets"
+      >
         <strong>{{ ticket.title }}</strong>
         <span>{{ ticket.asset }}</span>
+
         <p>{{ ticket.description }}</p>
+
+        <label class="card-label">Diagnosis</label>
+
+        <textarea
+          class="small-textarea"
+          [(ngModel)]="diagnoses[ticket.ticketId]"
+          placeholder="Enter diagnosis"
+        ></textarea>
+
+        <textarea
+          class="small-textarea"
+          [(ngModel)]="statusComments[ticket.ticketId]"
+          placeholder="Comment (optional)"
+        ></textarea>
+
+        <button
+          class="resolve-button"
+          type="button"
+          [disabled]="updatingTicketId === ticket.ticketId"
+          (click)="resolveTicket(ticket)"
+        >
+          {{
+            updatingTicketId === ticket.ticketId
+              ? 'Updating...'
+              : 'Resolve Ticket'
+          }}
+        </button>
       </article>
 
       <p class="empty" *ngIf="inProgressTickets.length === 0">
@@ -85,19 +137,25 @@
       </p>
     </div>
 
+    <!-- RESOLVED -->
     <div class="column">
       <div class="column-header">
         <h2>Resolved</h2>
         <span>{{ resolvedTickets.length }}</span>
       </div>
 
-      <article class="ticket-card" *ngFor="let ticket of resolvedTickets">
+      <article
+        class="ticket-card"
+        *ngFor="let ticket of resolvedTickets"
+      >
         <strong>{{ ticket.title }}</strong>
         <span>{{ ticket.asset }}</span>
+
         <p>{{ ticket.description }}</p>
 
         <p class="diagnosis" *ngIf="ticket.diagnosis">
-          <strong>Diagnosis:</strong> {{ ticket.diagnosis }}
+          <strong>Diagnosis:</strong>
+          {{ ticket.diagnosis }}
         </p>
       </article>
 
@@ -109,3 +167,7 @@
   </section>
 
 </main>
+
+<div class="message-container" *ngIf="errorMessage">
+  {{ errorMessage }}
+</div>
