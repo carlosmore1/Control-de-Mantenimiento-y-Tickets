@@ -17,12 +17,20 @@ builder.Services.AddScoped<ITicketService, TicketService>();
 
 builder.Services.AddOpenApi();
 
+var allowedOrigins = builder.Configuration["AllowedOrigins"]?
+    .Split(
+        ',',
+        StringSplitOptions.RemoveEmptyEntries |
+        StringSplitOptions.TrimEntries
+    )
+    ?? new[] { "http://localhost:4200" };
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
         policy
-            .WithOrigins("http://localhost:4200")
+            .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod();
     });

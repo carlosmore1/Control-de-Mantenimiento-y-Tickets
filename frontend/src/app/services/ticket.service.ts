@@ -8,12 +8,14 @@ import {
   ChangeTicketStatusRequest
 } from '../models/ticket';
 
+import { environment } from '../../environments/environment';
+
 @Injectable({
   providedIn: 'root'
 })
 export class TicketService {
 
-  private readonly apiUrl = 'http://localhost:5054/api/tickets';
+  private readonly apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
