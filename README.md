@@ -408,8 +408,26 @@ PROMPTS.md
 
 ## Deployment
 
-Public deployment is currently pending.
+The application is publicly deployed on Railway.
 
-The application will be deployed using Railway.
+### Frontend
 
-The public frontend and backend URLs will be added to this section after deployment.
+https://frontend-production-e04f.up.railway.app
+
+### Backend API
+
+https://backend-production-68463.up.railway.app
+
+### API Tickets Endpoint
+
+https://backend-production-68463.up.railway.app/api/tickets
+
+The deployed architecture includes:
+
+- Angular frontend served with Nginx.
+- ASP.NET Core Web API backend.
+- MySQL database.
+- Entity Framework Core migrations.
+- MySQL stored procedure for ticket status transitions and history registration.
+
+All services are deployed in Railway.
