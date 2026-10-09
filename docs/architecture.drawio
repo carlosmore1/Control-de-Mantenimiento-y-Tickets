@@ -1,0 +1,167 @@
+<mxfile host="Electron">
+  <diagram name="Página-1" id="8hE0h3RFUxqs-QMCg5MY">
+    <mxGraphModel dx="2049" dy="1219" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1900" pageHeight="1050" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=26;fontStyle=1;fontColor=#1F2937;" value="Maintenance Ticket Control - Production Architecture" vertex="1">
+          <mxGeometry height="50" width="850" x="520" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="userActor" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;strokeColor=#4A6FA5;fillColor=#DAE8FC;" value="" vertex="1">
+          <mxGeometry height="110" width="70" x="70" y="375" as="geometry" />
+        </mxCell>
+        <mxCell id="userLabel" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#1F2937;" value="User / Operator" vertex="1">
+          <mxGeometry height="40" width="170" x="20" y="495" as="geometry" />
+        </mxCell>
+        <mxCell id="railwayCloud" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8F7FC;strokeColor=#6D28D9;strokeWidth=3;dashed=1;" value="" vertex="1">
+          <mxGeometry height="760" width="1570" x="240" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="cloudIcon" parent="1" style="shape=cloud;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#6D28D9;fontSize=20;fontStyle=1;fontColor=#4C1D95;" value="Railway Cloud" vertex="1">
+          <mxGeometry height="110" width="220" x="270" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="frontendContainer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F4EEFA;strokeColor=#9673A6;strokeWidth=2;" value="" vertex="1">
+          <mxGeometry height="430" width="350" x="330" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="frontendHeader" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=18;fontStyle=1;fontColor=#3F2E49;" value="FRONTEND SERVICE" vertex="1">
+          <mxGeometry height="55" width="350" x="330" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="browser" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9673A6;strokeWidth=2;" value="" vertex="1">
+          <mxGeometry height="145" width="240" x="385" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="browserBar" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE7F2;strokeColor=#9673A6;" value="" vertex="1">
+          <mxGeometry height="28" width="240" x="385" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="angularText" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#6C4A7C;" value="Angular" vertex="1">
+          <mxGeometry height="30" width="160" x="425" y="402" as="geometry" />
+        </mxCell>
+        <mxCell id="ui" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9673A6;fontSize=14;" value="Ticket Management UI" vertex="1">
+          <mxGeometry height="40" width="190" x="410" y="448" as="geometry" />
+        </mxCell>
+        <mxCell id="nginx" parent="1" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9673A6;fontSize=15;fontStyle=1;" value="Nginx" vertex="1">
+          <mxGeometry height="70" width="180" x="415" y="570" as="geometry" />
+        </mxCell>
+        <mxCell id="frontendDesc" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#6B7280;" value="Serves Angular production files" vertex="1">
+          <mxGeometry height="30" width="240" x="385" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="backendContainer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDF7ED;strokeColor=#82B366;strokeWidth=2;" value="" vertex="1">
+          <mxGeometry height="540" width="410" x="790" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="backendHeader" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=18;fontStyle=1;fontColor=#355B37;" value="BACKEND SERVICE - ASP.NET CORE WEB API" vertex="1">
+          <mxGeometry height="55" width="410" x="790" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="api" parent="1" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#82B366;strokeWidth=2;fontSize=20;fontStyle=1;" value="API" vertex="1">
+          <mxGeometry height="75" width="160" x="915" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="controller" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#82B366;fontSize=15;fontStyle=1;" value="TicketsController" vertex="1">
+          <mxGeometry height="60" width="240" x="875" y="425" as="geometry" />
+        </mxCell>
+        <mxCell id="service" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#82B366;fontSize=15;fontStyle=1;" value="TicketService" vertex="1">
+          <mxGeometry height="60" width="240" x="875" y="535" as="geometry" />
+        </mxCell>
+        <mxCell id="serviceDesc" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#6B7280;" value="Business rules and state transitions" vertex="1">
+          <mxGeometry height="25" width="290" x="850" y="600" as="geometry" />
+        </mxCell>
+        <mxCell id="dbContext" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#82B366;fontSize=15;fontStyle=1;" value="ApplicationDbContext" vertex="1">
+          <mxGeometry height="60" width="240" x="875" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="efText" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#6B7280;" value="Entity Framework Core" vertex="1">
+          <mxGeometry height="25" width="200" x="895" y="715" as="geometry" />
+        </mxCell>
+        <mxCell id="databaseContainer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#D6B656;strokeWidth=2;" value="" vertex="1">
+          <mxGeometry height="540" width="420" x="1310" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="databaseHeader" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=18;fontStyle=1;fontColor=#725E19;" value="DATABASE SERVICE - MySQL" vertex="1">
+          <mxGeometry height="55" width="420" x="1310" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="mysql" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#FFFFFF;strokeColor=#D6B656;strokeWidth=2;fontSize=18;fontStyle=1;" value="MySQL" vertex="1">
+          <mxGeometry height="95" width="180" x="1430" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="tickets" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#FFFFFF;strokeColor=#D6B656;fontSize=15;fontStyle=1;" value="Tickets" vertex="1">
+          <mxGeometry height="85" width="145" x="1345" y="447.5" as="geometry" />
+        </mxCell>
+        <mxCell id="history" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#FFFFFF;strokeColor=#D6B656;fontSize=15;fontStyle=1;" value="TicketHistories" vertex="1">
+          <mxGeometry height="85" width="145" x="1550" y="447.5" as="geometry" />
+        </mxCell>
+        <mxCell id="relation" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#725E19;" value="1 : N" vertex="1">
+          <mxGeometry height="25" width="60" x="1490" y="463" as="geometry" />
+        </mxCell>
+        <mxCell id="procedure" parent="1" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#FFFFFF;strokeColor=#D6B656;strokeWidth=2;fontSize=14;fontStyle=1;" value="Stored Procedure&#xa;&#xa;sp_change_ticket_status" vertex="1">
+          <mxGeometry height="95" width="200" x="1420" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="userActor" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=13;labelBackgroundColor=#FFFFFF;" target="browser" value="HTTPS">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="browser" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=13;labelBackgroundColor=#FFFFFF;" target="api" value="HTTPS /&lt;div&gt;&amp;nbsp;REST API&lt;/div&gt;">
+          <mxGeometry relative="1" x="-0.2133" as="geometry">
+            <mxPoint y="1" as="offset" />
+            <Array as="points">
+              <mxPoint x="740" y="432.5" />
+              <mxPoint x="740" y="347.5" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="api" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;" target="controller" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="controller" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;" target="service" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="service" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;" target="dbContext" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="dbContext" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=13;labelBackgroundColor=#FFFFFF;" target="mysql" value="Railway Private&lt;div&gt;&amp;nbsp;Network&lt;/div&gt;">
+          <mxGeometry relative="1" x="-0.0151" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="1260" y="670" />
+              <mxPoint x="1260" y="357.5" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="tickets" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=none;startArrow=none;" target="history" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="dbContext" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=12;labelBackgroundColor=#FFFFFF;" target="procedure" value="Execute SP">
+          <mxGeometry relative="1" x="0.4098" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="1230" y="690" />
+              <mxPoint x="1230" y="690" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="procedure" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=12;labelBackgroundColor=#FFFFFF;" target="tickets" value="Update&amp;nbsp;&lt;div&gt;status&lt;/div&gt;">
+          <mxGeometry relative="1" x="-0.1765" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="1500" y="590" />
+              <mxPoint x="1417.5" y="590" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="1" source="procedure" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=12;labelBackgroundColor=#FFFFFF;" target="history" value="Insert&amp;nbsp;&lt;div&gt;history&lt;/div&gt;">
+          <mxGeometry relative="1" x="-0.1176" as="geometry">
+            <Array as="points">
+              <mxPoint x="1540" y="590" />
+              <mxPoint x="1622.5" y="590" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="footer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F4F6;strokeColor=#D1D5DB;fontSize=14;fontStyle=1;fontColor=#4B5563;" value="Production deployment: Angular + ASP.NET Core + MySQL on Railway" vertex="1">
+          <mxGeometry height="45" width="520" x="730" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="o2pYKoljwf_mZ4iav8KE-3" edge="1" parent="1" source="nginx" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="browser" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="580" y="540" as="sourcePoint" />
+            <mxPoint x="630" y="490" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="o2pYKoljwf_mZ4iav8KE-4" connectable="0" parent="o2pYKoljwf_mZ4iav8KE-3" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Serves&amp;nbsp;&lt;div&gt;Angular app&lt;/div&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.0544" y="-2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
