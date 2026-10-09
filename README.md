@@ -678,3 +678,5 @@ Resolved
 ```
 
 Each valid transition is controlled by backend business rules and persisted in the database history.
+
+- `api.md` - REST API documentation.
