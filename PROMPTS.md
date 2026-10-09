@@ -1,7 +1,7 @@
 Prompt 01 
 Explain the main concepts of Angular and React for frontend development, Python for backend development, and Railway, AWS, and Azure for cloud deployment. Explain what each technology is, what role it has in a full-stack application, its main characteristics, and the differences between the available alternatives. Include simple examples of how they could be applied to a maintenance ticket management system.
 
-Prompt 2 
+Prompt 02 
 I want to develop a maintenance ticket application using Angular, ASP.NET Core with C#, SQL Server, and Railway.
 Before starting to code, help me define how the project should be structured: the main parts of the frontend, backend, database, and documentation, the main entities I should use, and the general flow between them.
 
@@ -34,4 +34,3 @@ When I create a ticket, it is saved correctly, but it does not appear immediatel
 
 Prompt 12 
 Now I want to change ticket statuses from the Angular screen, moving from Pending to In Progress and then to Resolved. I also want to require a diagnosis before resolving it. How can I connect this with what I already have in the backend?
-

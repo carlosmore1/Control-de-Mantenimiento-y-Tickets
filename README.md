@@ -2,7 +2,21 @@
 
 Maintenance Ticket Control is a full-stack web application developed for the Fractal Developer Training Program - Level 2 challenge.
 
-The application allows users to create maintenance tickets, manage their status through a controlled workflow, and keep a persistent history of valid status changes.
+The application manages maintenance incidents through tickets, controlled status transitions, business rules, diagnosis validation, comments, and a persistent history of status changes.
+
+## Live Application
+
+### Frontend
+
+https://frontend-production-e04f.up.railway.app
+
+### Backend API
+
+https://backend-production-68463.up.railway.app
+
+### Tickets Endpoint
+
+https://backend-production-68463.up.railway.app/api/tickets
 
 ## Main Features
 
@@ -13,39 +27,15 @@ The application allows users to create maintenance tickets, manage their status 
 - Require a diagnosis before resolving a ticket.
 - Reject invalid status transitions.
 - Add optional comments during status changes.
-- Store the history of ticket status changes.
+- Store every valid status change in ticket history.
+- Persist ticket information in MySQL.
 - Update ticket status and history through a MySQL stored procedure.
-
-## Technology Stack
-
-### Frontend
-
-- Angular
-- TypeScript
-- HTML
-- CSS
-
-### Backend
-
-- ASP.NET Core Web API
-- C#
-- Entity Framework Core
-
-### Database
-
-- MySQL
-- Entity Framework Core Migrations
-- Stored Procedures
-
-### Tools and Deployment
-
-- Git
-- GitHub
-- Railway
+- Display controlled validation errors in the frontend.
+- Run the complete application publicly on Railway.
 
 ## Ticket Workflow
 
-The application uses the following ticket lifecycle:
+The application uses the following lifecycle:
 
 ```text
 Pending -> InProgress -> Resolved
@@ -60,13 +50,44 @@ InProgress -> Resolved
 
 Invalid transitions are rejected by the backend.
 
-For example, the following transition is not allowed:
+For example:
 
 ```text
 Pending -> Resolved
 ```
 
+is not allowed directly.
+
 A diagnosis is required before a ticket can be moved to `Resolved`.
+
+## Technology Stack
+
+### Frontend
+
+- Angular
+- TypeScript
+- HTML
+- CSS
+- Nginx
+
+### Backend
+
+- ASP.NET Core Web API
+- C#
+- Entity Framework Core
+
+### Database
+
+- MySQL
+- Entity Framework Core Migrations
+- MySQL Stored Procedures
+
+### Deployment and Tools
+
+- Railway
+- Docker
+- Git
+- GitHub
 
 ## Project Structure
 
@@ -74,6 +95,14 @@ A diagnosis is required before a ticket can be moved to `Resolved`.
 .
 ├── backend/
 │   └── MaintenanceTickets.Api/
+│       ├── Controllers/
+│       ├── Data/
+│       ├── Dtos/
+│       ├── Migrations/
+│       ├── Models/
+│       ├── Services/
+│       ├── Dockerfile
+│       └── Program.cs
 │
 ├── database/
 │   └── 01-change-ticket-status.sql
@@ -86,6 +115,9 @@ A diagnosis is required before a ticket can be moved to `Resolved`.
 │   └── sequence-diagram.md
 │
 ├── frontend/
+│   ├── src/
+│   ├── Dockerfile
+│   └── nginx.conf
 │
 ├── .gitignore
 ├── PROMPTS.md
@@ -94,16 +126,19 @@ A diagnosis is required before a ticket can be moved to `Resolved`.
 
 ## System Architecture
 
-The application separates the frontend, backend, business logic, data access, and database responsibilities.
+The application separates frontend, backend, business logic, data access, and database responsibilities.
 
 ```text
 User / Operator
        |
+       | HTTPS
        v
-Angular Frontend
+Railway Frontend
+Nginx + Angular
        |
-       | HTTP / REST
+       | HTTPS / REST API
        v
+Railway Backend
 ASP.NET Core Web API
        |
        v
@@ -116,17 +151,53 @@ TicketService
 ApplicationDbContext
 Entity Framework Core
        |
+       | Railway Private Network
        v
-MySQL
+Railway MySQL
 ```
 
-The `TicketsController` receives HTTP requests.
+### Frontend
 
-The `TicketService` contains the ticket business rules and validates status transitions.
+The Angular frontend is responsible for:
 
-Entity Framework Core is used for data access and communication with MySQL.
+- Displaying the ticket management interface.
+- Creating new tickets.
+- Showing tickets grouped by status.
+- Sending status changes to the backend.
+- Requesting a diagnosis before resolving a ticket.
+- Displaying validation errors returned by the application.
 
-The architecture diagram is available in:
+The production Angular files are served using Nginx.
+
+### Backend
+
+The ASP.NET Core Web API is responsible for:
+
+- Receiving HTTP requests.
+- Validating ticket data.
+- Applying business rules.
+- Controlling valid status transitions.
+- Rejecting invalid transitions.
+- Executing database operations.
+
+The `TicketsController` handles HTTP requests while the `TicketService` contains the business logic.
+
+### Data Access
+
+Entity Framework Core is used for:
+
+- Mapping application entities to MySQL tables.
+- Creating and reading tickets.
+- Managing database migrations.
+- Executing the stored procedure used for status transitions.
+
+### Database
+
+MySQL stores the ticket and ticket history information.
+
+The backend communicates with MySQL using Railway private networking.
+
+The production architecture diagram is available in:
 
 ```text
 docs/architecture.png
@@ -140,7 +211,7 @@ docs/architecture.drawio
 
 ## Data Model
 
-The application currently uses two main entities.
+The application contains two main entities.
 
 ### Ticket
 
@@ -170,7 +241,7 @@ Main fields:
 - `Comment`
 - `CreatedAt`
 
-Relationship:
+The relationship is:
 
 ```text
 Ticket 1 ---- N TicketHistory
@@ -178,7 +249,7 @@ Ticket 1 ---- N TicketHistory
 
 One ticket can have multiple history records.
 
-More information about the data model is available in:
+More information is available in:
 
 ```text
 docs/data-model.md
@@ -186,7 +257,7 @@ docs/data-model.md
 
 ## Stored Procedure
 
-The project uses the following MySQL stored procedure:
+Ticket status changes are processed using the following MySQL stored procedure:
 
 ```text
 sp_change_ticket_status
@@ -198,10 +269,10 @@ The stored procedure is responsible for:
 - Updating the ticket status.
 - Updating the diagnosis when provided.
 - Updating the modification date.
-- Registering the status change in `TicketHistories`.
+- Inserting the status change into `TicketHistories`.
 - Executing the update and history registration inside the same transaction.
 
-The SQL script is located in:
+The SQL source code is located in:
 
 ```text
 database/01-change-ticket-status.sql
@@ -216,6 +287,12 @@ GET /api/tickets
 ```
 
 Returns all maintenance tickets.
+
+Production example:
+
+```text
+https://backend-production-68463.up.railway.app/api/tickets
+```
 
 ### Create Ticket
 
@@ -260,22 +337,56 @@ Example request to resolve a ticket:
 }
 ```
 
-Invalid transitions are rejected by the backend.
+The backend rejects invalid transitions and requires a diagnosis before resolving a ticket.
+
+## Sequence Diagrams
+
+The project documents two main application flows:
+
+1. Ticket creation.
+2. Ticket status transition and history registration.
+
+The sequence diagrams are available in:
+
+```text
+docs/sequence-diagram.md
+```
+
+## Interface Mockup
+
+A low-fidelity interface mockup was created for the maintenance ticket board.
+
+The mockup includes:
+
+- Ticket creation form.
+- Pending column.
+- In Progress column.
+- Resolved column.
+- Status transition actions.
+- Diagnosis input.
+- Optional comments.
+
+The mockup is available in:
+
+```text
+docs/mockup.png
+```
 
 ## Running the Project Locally
 
 ### Requirements
 
-The project was developed using:
+Install:
 
 - .NET SDK 10
 - Node.js
 - Angular CLI
-- MySQL Server 8
+- MySQL Server
+- Git
 
-## Database Configuration
+## Database Setup
 
-Create the database:
+Create the local database:
 
 ```sql
 CREATE DATABASE maintenance_tickets_db;
@@ -283,7 +394,7 @@ CREATE DATABASE maintenance_tickets_db;
 
 Configure a MySQL user with access to the database.
 
-The database password and connection string are not stored directly in the source code.
+The database connection string and password are not stored directly in the source code.
 
 Before running the backend, configure the connection string using an environment variable.
 
@@ -293,9 +404,9 @@ Example using PowerShell:
 $env:ConnectionStrings__DefaultConnection='Server=localhost;Port=3306;Database=maintenance_tickets_db;User=maintenance_app;Password=YOUR_PASSWORD;'
 ```
 
-Replace `YOUR_PASSWORD` with the password configured for your MySQL user.
+Replace `YOUR_PASSWORD` with the password configured for the local MySQL user.
 
-### Apply Database Migrations
+## Apply Database Migrations
 
 Open a terminal in:
 
@@ -309,11 +420,11 @@ Run:
 dotnet ef database update
 ```
 
-This creates the application tables using the existing Entity Framework Core migrations.
+Entity Framework Core will create the required application tables.
 
-### Create the Stored Procedure
+## Create the Stored Procedure
 
-Execute the following SQL file in the `maintenance_tickets_db` database:
+Execute the following file in the `maintenance_tickets_db` database:
 
 ```text
 database/01-change-ticket-status.sql
@@ -333,7 +444,7 @@ Open a terminal in:
 backend/MaintenanceTickets.Api
 ```
 
-Make sure the database connection environment variable is configured.
+Make sure the connection string environment variable is configured.
 
 Run:
 
@@ -341,10 +452,16 @@ Run:
 dotnet run
 ```
 
-The local API is currently configured to run at:
+The local API runs at:
 
 ```text
 http://localhost:5054
+```
+
+The local tickets endpoint is:
+
+```text
+http://localhost:5054/api/tickets
 ```
 
 ## Run the Frontend
@@ -355,79 +472,209 @@ Open another terminal in:
 frontend
 ```
 
-Install the dependencies:
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-Start the Angular application:
+Start the Angular development server:
 
 ```bash
 ng serve
 ```
 
-Open the application in the browser:
+Open:
 
 ```text
 http://localhost:4200
 ```
 
+The development environment communicates with:
+
+```text
+http://localhost:5054/api/tickets
+```
+
+## Environment Configuration
+
+The project uses environment-based configuration instead of hardcoded private credentials.
+
+### Backend
+
+The database connection is configured through:
+
+```text
+ConnectionStrings__DefaultConnection
+```
+
+CORS origins can be configured through:
+
+```text
+AllowedOrigins
+```
+
+The Railway application port is obtained from:
+
+```text
+PORT
+```
+
+### Frontend
+
+Angular uses separate configuration for development and production.
+
+Development API:
+
+```text
+http://localhost:5054/api/tickets
+```
+
+Production API:
+
+```text
+https://backend-production-68463.up.railway.app/api/tickets
+```
+
+## Deployment
+
+The complete application is deployed on Railway.
+
+The production environment contains three main services:
+
+```text
+Railway
+├── Frontend
+│   ├── Angular
+│   └── Nginx
+│
+├── Backend
+│   └── ASP.NET Core Web API
+│
+└── MySQL
+    ├── Tickets
+    ├── TicketHistories
+    └── sp_change_ticket_status
+```
+
+### Frontend Deployment
+
+The Angular application is built using Docker and served with Nginx.
+
+Public URL:
+
+```text
+https://frontend-production-e04f.up.railway.app
+```
+
+### Backend Deployment
+
+The ASP.NET Core API is built and deployed using Docker.
+
+Public URL:
+
+```text
+https://backend-production-68463.up.railway.app
+```
+
+The backend automatically applies pending Entity Framework Core migrations when the application starts.
+
+### Database Deployment
+
+MySQL runs as a Railway database service.
+
+The backend connects to MySQL through Railway private networking.
+
+The database contains:
+
+- `Tickets`
+- `TicketHistories`
+- `__EFMigrationsHistory`
+- `sp_change_ticket_status`
+
+Database credentials are configured using Railway environment variables and are not stored in the repository.
+
+## CORS Configuration
+
+The backend uses configurable CORS origins.
+
+For local development:
+
+```text
+http://localhost:4200
+```
+
+For production:
+
+```text
+https://frontend-production-e04f.up.railway.app
+```
+
+This allows the Angular frontend to communicate securely with the ASP.NET Core API.
+
 ## Documentation
 
-Project documentation is stored in the `docs` directory.
+Project documentation is available in the `docs` directory:
 
-It includes:
-
-- Interface mockup.
-- System architecture diagram.
-- Data model.
-- Sequence diagrams.
-
-The interface mockup is available in:
-
-```text
-docs/mockup.png
-```
-
-The sequence diagrams are available in:
-
-```text
-docs/sequence-diagram.md
-```
+- `architecture.drawio` - Editable production architecture diagram.
+- `architecture.png` - Production architecture image.
+- `data-model.md` - Ticket and TicketHistory data model.
+- `mockup.png` - Interface mockup.
+- `sequence-diagram.md` - Application sequence diagrams.
 
 ## AI Usage
 
 Artificial intelligence was used as a support tool during the development process.
 
-The prompts used during the project are documented in:
+It was used mainly for:
+
+- Reviewing the initial technology stack.
+- Defining the initial project structure.
+- Supporting backend and database configuration.
+- Troubleshooting Entity Framework and MySQL issues.
+- Supporting Angular development and debugging.
+- Implementing and reviewing the ticket workflow.
+- Supporting deployment configuration.
+
+The prompts used during development are documented in:
 
 ```text
 PROMPTS.md
 ```
 
-## Deployment
+## Repository
 
-The application is publicly deployed on Railway.
+This repository contains:
 
-### Frontend
-
-https://frontend-production-e04f.up.railway.app
-
-### Backend API
-
-https://backend-production-68463.up.railway.app
-
-### API Tickets Endpoint
-
-https://backend-production-68463.up.railway.app/api/tickets
-
-The deployed architecture includes:
-
-- Angular frontend served with Nginx.
-- ASP.NET Core Web API backend.
-- MySQL database.
+- Angular frontend source code.
+- ASP.NET Core backend source code.
 - Entity Framework Core migrations.
-- MySQL stored procedure for ticket status transitions and history registration.
+- MySQL stored procedure.
+- Docker deployment configuration.
+- Nginx production configuration.
+- Interface mockup.
+- Architecture diagram.
+- Data model documentation.
+- Sequence diagrams.
+- AI prompt documentation.
 
-All services are deployed in Railway.
+## Final Status
+
+The main Level 2 requirements are implemented and publicly deployed.
+
+The application currently supports the complete maintenance ticket workflow:
+
+```text
+Create Ticket
+     |
+     v
+Pending
+     |
+     v
+InProgress
+     |
+     v
+Resolved
+```
+
+Each valid transition is controlled by backend business rules and persisted in the database history.
