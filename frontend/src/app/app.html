@@ -101,6 +101,7 @@
           class="ticket-card"
           *ngFor="let ticket of pendingTickets"
         >
+
           <strong>{{ ticket.title }}</strong>
 
           <span>
@@ -110,6 +111,27 @@
           <p>
             {{ ticket.description }}
           </p>
+
+          <!-- OPERATOR ASSIGNMENT -->
+          <label class="card-label">
+            Assigned operator
+          </label>
+
+          <select
+            class="operator-select"
+            [(ngModel)]="assignedOperators[ticket.ticketId]"
+          >
+            <option value="">
+              Select operator
+            </option>
+
+            <option
+              *ngFor="let operator of operators"
+              [value]="operator"
+            >
+              {{ operator }}
+            </option>
+          </select>
 
           <textarea
             class="small-textarea"
@@ -162,6 +184,15 @@
 
           <p>
             {{ ticket.description }}
+          </p>
+
+          <!-- ASSIGNED OPERATOR -->
+          <p
+            class="assigned-operator"
+            *ngIf="ticket.assignedOperator"
+          >
+            <strong>Operator:</strong>
+            {{ ticket.assignedOperator }}
           </p>
 
           <label class="card-label">
@@ -225,6 +256,15 @@
 
           <p>
             {{ ticket.description }}
+          </p>
+
+          <!-- ASSIGNED OPERATOR -->
+          <p
+            class="assigned-operator"
+            *ngIf="ticket.assignedOperator"
+          >
+            <strong>Operator:</strong>
+            {{ ticket.assignedOperator }}
           </p>
 
           <p

@@ -5,6 +5,7 @@ export interface Ticket {
   description: string;
   status: string;
   diagnosis: string | null;
+  assignedOperator: string | null;
   createdAt: string;
   updatedAt: string | null;
 }
@@ -19,4 +20,5 @@ export interface ChangeTicketStatusRequest {
   newStatus: string;
   comment?: string;
   diagnosis?: string;
+  assignedOperator?: string;
 }

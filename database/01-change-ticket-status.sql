@@ -6,7 +6,8 @@ CREATE PROCEDURE sp_change_ticket_status(
     IN p_ticket_id INT,
     IN p_new_status VARCHAR(20),
     IN p_comment VARCHAR(500),
-    IN p_diagnosis VARCHAR(500)
+    IN p_diagnosis VARCHAR(500),
+    IN p_assigned_operator VARCHAR(100)
 )
 BEGIN
     DECLARE v_previous_status VARCHAR(20);
@@ -31,28 +32,31 @@ BEGIN
     END IF;
 
     UPDATE Tickets
-    SET
-        Status = p_new_status,
+    SET Status = p_new_status,
         Diagnosis = COALESCE(p_diagnosis, Diagnosis),
+        AssignedOperator = COALESCE(
+            p_assigned_operator,
+            AssignedOperator
+        ),
         UpdatedAt = UTC_TIMESTAMP()
     WHERE TicketId = p_ticket_id;
 
     INSERT INTO TicketHistories
-    (
-        TicketId,
-        PreviousStatus,
-        NewStatus,
-        Comment,
-        CreatedAt
-    )
+        (
+            TicketId,
+            PreviousStatus,
+            NewStatus,
+            Comment,
+            CreatedAt
+        )
     VALUES
-    (
-        p_ticket_id,
-        v_previous_status,
-        p_new_status,
-        p_comment,
-        UTC_TIMESTAMP()
-    );
+        (
+            p_ticket_id,
+            v_previous_status,
+            p_new_status,
+            p_comment,
+            UTC_TIMESTAMP()
+        );
 
     COMMIT;
 END //

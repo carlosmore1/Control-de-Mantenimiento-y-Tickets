@@ -13,6 +13,7 @@ public class Ticket
     public TicketStatus Status { get; set; } = TicketStatus.Pending;
 
     public string? Diagnosis { get; set; }
+    public string? AssignedOperator { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

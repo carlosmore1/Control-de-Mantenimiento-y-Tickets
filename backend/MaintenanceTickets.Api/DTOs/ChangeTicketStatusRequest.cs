@@ -5,4 +5,5 @@ public class ChangeTicketStatusRequest
     public string NewStatus { get; set; } = string.Empty;
     public string? Comment { get; set; }
     public string? Diagnosis { get; set; }
+    public string? AssignedOperator { get; set; }
 }
