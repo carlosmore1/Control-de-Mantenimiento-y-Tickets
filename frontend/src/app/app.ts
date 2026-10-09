@@ -29,9 +29,16 @@ export class App implements OnInit {
   statusComments: Record<number, string> = {};
   diagnoses: Record<number, string> = {};
 
+  selectedStatus = 'All';
+  selectedDate = '';
+
   errorMessage = '';
+  successMessage = '';
+
   isLoading = false;
   updatingTicketId: number | null = null;
+
+  private successTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private ticketService: TicketService,
@@ -43,20 +50,20 @@ export class App implements OnInit {
   }
 
   get pendingTickets(): Ticket[] {
-    return this.tickets.filter(
-      ticket => ticket.status === 'Pending'
+    return this.applyFilters(
+      this.tickets.filter(ticket => ticket.status === 'Pending')
     );
   }
 
   get inProgressTickets(): Ticket[] {
-    return this.tickets.filter(
-      ticket => ticket.status === 'InProgress'
+    return this.applyFilters(
+      this.tickets.filter(ticket => ticket.status === 'InProgress')
     );
   }
 
   get resolvedTickets(): Ticket[] {
-    return this.tickets.filter(
-      ticket => ticket.status === 'Resolved'
+    return this.applyFilters(
+      this.tickets.filter(ticket => ticket.status === 'Resolved')
     );
   }
 
@@ -120,7 +127,8 @@ export class App implements OnInit {
         this.replaceTicket(updatedTicket);
         this.statusComments[ticket.ticketId] = '';
         this.updatingTicketId = null;
-        this.changeDetectorRef.markForCheck();
+
+        this.showSuccess('Ticket moved to In Progress successfully.');
       },
       error: error => {
         this.errorMessage = this.getErrorMessage(error);
@@ -154,7 +162,8 @@ export class App implements OnInit {
         this.diagnoses[ticket.ticketId] = '';
 
         this.updatingTicketId = null;
-        this.changeDetectorRef.markForCheck();
+
+        this.showSuccess('Ticket resolved successfully.');
       },
       error: error => {
         this.errorMessage = this.getErrorMessage(error);
@@ -164,12 +173,52 @@ export class App implements OnInit {
     });
   }
 
+  clearFilters(): void {
+    this.selectedStatus = 'All';
+    this.selectedDate = '';
+    this.changeDetectorRef.markForCheck();
+  }
+
+  private applyFilters(tickets: Ticket[]): Ticket[] {
+    return tickets.filter(ticket => {
+
+      const matchesStatus =
+        this.selectedStatus === 'All' ||
+        ticket.status === this.selectedStatus;
+
+      const ticketDate = new Date(ticket.createdAt)
+        .toISOString()
+        .slice(0, 10);
+
+      const matchesDate =
+        !this.selectedDate ||
+        ticketDate === this.selectedDate;
+
+      return matchesStatus && matchesDate;
+    });
+  }
+
   private replaceTicket(updatedTicket: Ticket): void {
     this.tickets = this.tickets.map(ticket =>
       ticket.ticketId === updatedTicket.ticketId
         ? updatedTicket
         : ticket
     );
+  }
+
+  private showSuccess(message: string): void {
+    this.successMessage = message;
+
+    if (this.successTimeout) {
+      clearTimeout(this.successTimeout);
+    }
+
+    this.changeDetectorRef.markForCheck();
+
+    this.successTimeout = setTimeout(() => {
+      this.successMessage = '';
+      this.changeDetectorRef.markForCheck();
+    }, 3000);
   }
 
   private getErrorMessage(error: any): string {
