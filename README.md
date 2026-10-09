@@ -2,7 +2,7 @@
 
 Maintenance Ticket Control is a full-stack web application developed for the Fractal Developer Training Program - Level 2 challenge.
 
-The application manages maintenance incidents through tickets, controlled status transitions, business rules, diagnosis validation, comments, and a persistent history of status changes.
+The application manages maintenance incidents through tickets, controlled status transitions, business rules, operator assignment, diagnosis validation, comments, filters, notifications, and a persistent history of status changes.
 
 ## Live Application
 
@@ -24,14 +24,32 @@ https://backend-production-68463.up.railway.app/api/tickets
 - View tickets grouped by status.
 - Move tickets from `Pending` to `InProgress`.
 - Move tickets from `InProgress` to `Resolved`.
+- Require an assigned operator before starting progress.
+- Persist the assigned operator in the ticket.
 - Require a diagnosis before resolving a ticket.
 - Reject invalid status transitions.
 - Add optional comments during status changes.
 - Store every valid status change in ticket history.
 - Persist ticket information in MySQL.
 - Update ticket status and history through a MySQL stored procedure.
+- Filter tickets by status.
+- Filter tickets by creation date.
+- Display simulated notifications after successful status changes.
 - Display controlled validation errors in the frontend.
 - Run the complete application publicly on Railway.
+
+## Bonus Features
+
+The project includes the optional bonus features:
+
+- Ticket assignment to operators.
+- Ticket filtering by status.
+- Ticket filtering by creation date.
+- Simulated notifications after successful status changes.
+
+An operator must be assigned before a ticket can move from `Pending` to `InProgress`.
+
+The assigned operator is persisted in the database and remains associated with the ticket when it is resolved.
 
 ## Ticket Workflow
 
@@ -58,7 +76,9 @@ Pending -> Resolved
 
 is not allowed directly.
 
-A diagnosis is required before a ticket can be moved to `Resolved`.
+An operator is required before a ticket can be moved from `Pending` to `InProgress`.
+
+A diagnosis is required before a ticket can be moved from `InProgress` to `Resolved`.
 
 ## Technology Stack
 
@@ -89,6 +109,34 @@ A diagnosis is required before a ticket can be moved to `Resolved`.
 - Git
 - GitHub
 
+## Technology Choices
+
+### Angular
+
+Angular was selected for the frontend because it provides a component-based architecture, form handling, HTTP communication, and a clear structure for building the ticket board and its interactions.
+
+### ASP.NET Core
+
+ASP.NET Core was selected for the backend because it provides a strongly typed REST API, dependency injection, and a clear separation between controllers, business logic, and data access.
+
+### Entity Framework Core
+
+Entity Framework Core is used to manage relational persistence, entity mappings, and database migrations while keeping database access separated from the controller layer.
+
+### MySQL
+
+MySQL was selected as the relational database because the application requires referential integrity between tickets and their history records. It also integrates with Entity Framework Core and Railway.
+
+### Railway
+
+Railway is used to deploy the Angular frontend, ASP.NET Core backend, and MySQL database in the same cloud environment while exposing the application through public URLs.
+
+### Docker and Nginx
+
+Docker provides reproducible production builds for the frontend and backend.
+
+Nginx is used to serve the compiled Angular application in production.
+
 ## Project Structure
 
 ```text
@@ -97,7 +145,7 @@ A diagnosis is required before a ticket can be moved to `Resolved`.
 │   └── MaintenanceTickets.Api/
 │       ├── Controllers/
 │       ├── Data/
-│       ├── Dtos/
+│       ├── DTOs/
 │       ├── Migrations/
 │       ├── Models/
 │       ├── Services/
@@ -108,6 +156,7 @@ A diagnosis is required before a ticket can be moved to `Resolved`.
 │   └── 01-change-ticket-status.sql
 │
 ├── docs/
+│   ├── api.md
 │   ├── architecture.drawio
 │   ├── architecture.png
 │   ├── data-model.md
@@ -163,8 +212,11 @@ The Angular frontend is responsible for:
 - Displaying the ticket management interface.
 - Creating new tickets.
 - Showing tickets grouped by status.
+- Assigning operators before starting ticket progress.
 - Sending status changes to the backend.
 - Requesting a diagnosis before resolving a ticket.
+- Filtering tickets by status and creation date.
+- Displaying simulated status-change notifications.
 - Displaying validation errors returned by the application.
 
 The production Angular files are served using Nginx.
@@ -177,6 +229,8 @@ The ASP.NET Core Web API is responsible for:
 - Validating ticket data.
 - Applying business rules.
 - Controlling valid status transitions.
+- Requiring an operator before starting progress.
+- Requiring a diagnosis before resolving a ticket.
 - Rejecting invalid transitions.
 - Executing database operations.
 
@@ -225,6 +279,7 @@ Main fields:
 - `Description`
 - `Status`
 - `Diagnosis`
+- `AssignedOperator`
 - `CreatedAt`
 - `UpdatedAt`
 
@@ -268,6 +323,8 @@ The stored procedure is responsible for:
 - Reading the previous ticket status.
 - Updating the ticket status.
 - Updating the diagnosis when provided.
+- Updating the assigned operator when provided.
+- Preserving the assigned operator during later transitions.
 - Updating the modification date.
 - Inserting the status change into `TicketHistories`.
 - Executing the update and history registration inside the same transaction.
@@ -323,9 +380,12 @@ Example request to move a ticket to `InProgress`:
 ```json
 {
   "newStatus": "InProgress",
-  "comment": "Technician started inspection"
+  "comment": "Technician started inspection",
+  "assignedOperator": "Operator 1"
 }
 ```
+
+An assigned operator is required before a ticket can start progress.
 
 Example request to resolve a ticket:
 
@@ -339,12 +399,21 @@ Example request to resolve a ticket:
 
 The backend rejects invalid transitions and requires a diagnosis before resolving a ticket.
 
+The operator assigned during the first transition remains associated with the ticket after resolution.
+
+Complete API documentation is available in:
+
+```text
+docs/api.md
+```
+
 ## Sequence Diagrams
 
-The project documents two main application flows:
+The project documents the main application flows:
 
 1. Ticket creation.
-2. Ticket status transition and history registration.
+2. Ticket assignment and transition from `Pending` to `InProgress`.
+3. Ticket resolution and history registration.
 
 The sequence diagrams are available in:
 
@@ -420,7 +489,9 @@ Run:
 dotnet ef database update
 ```
 
-Entity Framework Core will create the required application tables.
+Entity Framework Core will create and update the required application tables.
+
+The migrations include the `AssignedOperator` field used by the bonus ticket-assignment functionality.
 
 ## Create the Stored Procedure
 
@@ -435,6 +506,8 @@ This creates:
 ```text
 sp_change_ticket_status
 ```
+
+The stored procedure must be created after applying the database migrations.
 
 ## Run the Backend
 
@@ -554,6 +627,7 @@ Railway
 └── MySQL
     ├── Tickets
     ├── TicketHistories
+    ├── __EFMigrationsHistory
     └── sp_change_ticket_status
 ```
 
@@ -592,6 +666,8 @@ The database contains:
 - `__EFMigrationsHistory`
 - `sp_change_ticket_status`
 
+The `Tickets` table includes the `AssignedOperator` field used to persist operator assignment.
+
 Database credentials are configured using Railway environment variables and are not stored in the repository.
 
 ## CORS Configuration
@@ -616,6 +692,7 @@ This allows the Angular frontend to communicate securely with the ASP.NET Core A
 
 Project documentation is available in the `docs` directory:
 
+- `api.md` - REST API documentation.
 - `architecture.drawio` - Editable production architecture diagram.
 - `architecture.png` - Production architecture image.
 - `data-model.md` - Ticket and TicketHistory data model.
@@ -635,6 +712,8 @@ It was used mainly for:
 - Supporting Angular development and debugging.
 - Implementing and reviewing the ticket workflow.
 - Supporting deployment configuration.
+- Supporting the implementation of bonus filters, notifications, and operator assignment.
+- Reviewing technical documentation.
 
 The prompts used during development are documented in:
 
@@ -655,12 +734,13 @@ This repository contains:
 - Interface mockup.
 - Architecture diagram.
 - Data model documentation.
+- REST API documentation.
 - Sequence diagrams.
 - AI prompt documentation.
 
 ## Final Status
 
-The main Level 2 requirements are implemented and publicly deployed.
+The Level 2 requirements are implemented and publicly deployed.
 
 The application currently supports the complete maintenance ticket workflow:
 
@@ -670,13 +750,26 @@ Create Ticket
      v
 Pending
      |
+     | Assigned operator required
      v
 InProgress
      |
+     | Diagnosis required
      v
 Resolved
 ```
 
 Each valid transition is controlled by backend business rules and persisted in the database history.
 
-- `api.md` - REST API documentation.
+The final implementation also includes:
+
+- Operator assignment.
+- Status filtering.
+- Creation-date filtering.
+- Simulated status-change notifications.
+- Public frontend deployment.
+- Public backend API.
+- Persistent MySQL database.
+- Database migrations.
+- Stored procedure-based status transitions.
+- Technical diagrams and documentation.

@@ -1,38 +1,74 @@
-# Maintenance Ticket Control API
+# API Documentation
 
-This document describes the REST API used by the Maintenance Ticket Control application.
+## Overview
+
+The Maintenance Ticket Control API provides endpoints to create, list, and update maintenance tickets.
+
+The API manages the ticket lifecycle:
+
+```text
+Pending → InProgress → Resolved
+```
+
+It also validates business rules, assigns operators, stores diagnoses, and persists ticket status changes in the history table.
 
 ## Base URLs
 
-### Local Development
+### Local
 
 ```text
-http://localhost:5054
+http://localhost:5054/api/tickets
 ```
 
 ### Production
 
 ```text
-https://backend-production-68463.up.railway.app
+https://backend-production-68463.up.railway.app/api/tickets
 ```
 
-## Endpoints
+---
 
-### Get All Tickets
+## Ticket Model
 
-Returns all maintenance tickets.
+A ticket contains the following information:
+
+```json
+{
+  "ticketId": 1,
+  "title": "ATM screen failure",
+  "asset": "ATM-001",
+  "description": "The touch screen does not respond.",
+  "status": "Pending",
+  "diagnosis": null,
+  "assignedOperator": null,
+  "createdAt": "2026-10-09T15:00:00Z",
+  "updatedAt": null
+}
+```
+
+Possible status values:
+
+```text
+Pending
+InProgress
+Resolved
+```
+
+---
+
+# Endpoints
+
+## GET /api/tickets
+
+Returns all tickets stored in the database.
+
+### Request
 
 ```http
 GET /api/tickets
 ```
 
-#### Example Request
-
-```text
-GET https://backend-production-68463.up.railway.app/api/tickets
-```
-
-#### Success Response
+### Successful response
 
 Status:
 
@@ -48,71 +84,62 @@ Example:
     "ticketId": 1,
     "title": "ATM screen failure",
     "asset": "ATM-001",
-    "description": "The screen is not responding",
-    "status": "Resolved",
-    "diagnosis": "Display connection cable was disconnected",
-    "createdAt": "2026-10-08T20:00:00",
-    "updatedAt": "2026-10-08T20:15:00"
+    "description": "The touch screen does not respond.",
+    "status": "Pending",
+    "diagnosis": null,
+    "assignedOperator": null,
+    "createdAt": "2026-10-09T15:00:00Z",
+    "updatedAt": null
   }
 ]
 ```
 
-If there are no tickets, the API returns:
-
-```json
-[]
-```
-
 ---
 
-### Create Ticket
+## POST /api/tickets
 
 Creates a new maintenance ticket.
 
+Every new ticket is created with the `Pending` status.
+
+### Request
+
 ```http
 POST /api/tickets
+Content-Type: application/json
 ```
 
-New tickets are automatically created with the status:
-
-```text
-Pending
-```
-
-#### Request Body
+Body:
 
 ```json
 {
-  "title": "Printer failure",
-  "asset": "PRN-001",
-  "description": "The printer is not responding"
+  "title": "ATM screen failure",
+  "asset": "ATM-001",
+  "description": "The touch screen does not respond."
 }
 ```
 
-#### Success Response
+### Successful response
 
-Status:
-
-```text
-201 Created
-```
+The created ticket is returned.
 
 Example:
 
 ```json
 {
-  "ticketId": 2,
-  "title": "Printer failure",
-  "asset": "PRN-001",
-  "description": "The printer is not responding",
+  "ticketId": 1,
+  "title": "ATM screen failure",
+  "asset": "ATM-001",
+  "description": "The touch screen does not respond.",
   "status": "Pending",
   "diagnosis": null,
-  "createdAt": "2026-10-08T20:30:00",
+  "assignedOperator": null,
+  "createdAt": "2026-10-09T15:00:00Z",
   "updatedAt": null
 }
 ```
 
-#### Validation
+### Validation
 
 The following fields are required:
 
@@ -120,212 +147,214 @@ The following fields are required:
 - `asset`
 - `description`
 
-If any required field is missing or empty, the API returns:
-
-```text
-400 Bad Request
-```
-
 ---
 
-### Change Ticket Status
+## PUT /api/tickets/{id}/status
 
 Changes the status of an existing ticket.
 
-```http
-PUT /api/tickets/{id}/status
-```
+The endpoint validates the ticket lifecycle before executing the transition.
 
-The application uses the following workflow:
+### Valid transitions
 
 ```text
-Pending -> InProgress -> Resolved
+Pending → InProgress
+InProgress → Resolved
 ```
 
-Only valid transitions are accepted.
+Other transitions are rejected.
 
 ---
 
-#### Move Ticket to InProgress
+### Pending to In Progress
 
-Example request:
+An operator must be assigned when a ticket starts progress.
+
+Request:
 
 ```http
 PUT /api/tickets/1/status
+Content-Type: application/json
 ```
 
-Request body:
+Body:
 
 ```json
 {
   "newStatus": "InProgress",
-  "comment": "Technician started inspection"
+  "comment": "The equipment is being inspected.",
+  "assignedOperator": "Operator 1"
 }
 ```
 
-#### Success Response
+Business rules:
 
-Status:
+- The current status must be `Pending`.
+- The new status must be `InProgress`.
+- `assignedOperator` is required.
 
-```text
-200 OK
-```
+After the transition:
 
-Example:
-
-```json
-{
-  "ticketId": 1,
-  "title": "Printer failure",
-  "asset": "PRN-001",
-  "description": "The printer is not responding",
-  "status": "InProgress",
-  "diagnosis": null,
-  "createdAt": "2026-10-08T20:30:00",
-  "updatedAt": "2026-10-08T20:35:00"
-}
-```
+- The ticket status is updated.
+- The operator is stored in the ticket.
+- The transition is stored in `TicketHistories`.
+- The update date is recorded.
 
 ---
 
-#### Resolve Ticket
+### In Progress to Resolved
 
-A ticket can only be resolved from the `InProgress` state.
+A diagnosis is required before resolving a ticket.
 
-A diagnosis is required.
-
-Example request:
+Request:
 
 ```http
 PUT /api/tickets/1/status
+Content-Type: application/json
 ```
 
-Request body:
+Body:
 
 ```json
 {
   "newStatus": "Resolved",
-  "comment": "Equipment tested successfully",
-  "diagnosis": "Power cable was disconnected"
+  "comment": "The incident was corrected.",
+  "diagnosis": "The touch controller cable was loose."
 }
 ```
 
-#### Success Response
+Business rules:
 
-Status:
+- The current status must be `InProgress`.
+- The new status must be `Resolved`.
+- `diagnosis` is required.
+- The previously assigned operator is preserved.
 
-```text
-200 OK
-```
+After the transition:
 
-Example:
+- The status is changed to `Resolved`.
+- The diagnosis is stored.
+- The assigned operator remains associated with the ticket.
+- The transition is stored in `TicketHistories`.
+- The update date is recorded.
 
-```json
-{
-  "ticketId": 1,
-  "title": "Printer failure",
-  "asset": "PRN-001",
-  "description": "The printer is not responding",
-  "status": "Resolved",
-  "diagnosis": "Power cable was disconnected",
-  "createdAt": "2026-10-08T20:30:00",
-  "updatedAt": "2026-10-08T20:45:00"
-}
-```
+---
 
-## Business Rules
+# Business Rules
 
-The backend controls the ticket lifecycle.
-
-Valid transitions:
-
-```text
-Pending -> InProgress
-InProgress -> Resolved
-```
-
-Examples of invalid transitions:
-
-```text
-Pending -> Resolved
-Resolved -> InProgress
-Resolved -> Pending
-```
-
-Invalid transitions return:
-
-```text
-400 Bad Request
-```
-
-A ticket cannot be resolved without a diagnosis.
-
-If the diagnosis is missing, the API returns:
-
-```text
-400 Bad Request
-```
-
-## Error Responses
-
-### Ticket Not Found
-
-If the requested ticket does not exist:
-
-```text
-404 Not Found
-```
-
-### Invalid Status
-
-If the requested status is not supported:
-
-```text
-400 Bad Request
-```
-
-### Invalid Transition
-
-If the requested status transition is not allowed:
-
-```text
-400 Bad Request
-```
-
-### Missing Diagnosis
-
-If a ticket is moved to `Resolved` without a diagnosis:
-
-```text
-400 Bad Request
-```
-
-## Ticket Status Values
-
-The API currently uses the following status values:
+The application implements the following ticket lifecycle:
 
 ```text
 Pending
+   |
+   v
 InProgress
+   |
+   v
 Resolved
 ```
 
-## Ticket History
+The API blocks invalid transitions such as:
 
-Every valid status transition is persisted in the `TicketHistories` table.
+```text
+Pending → Resolved
+Resolved → InProgress
+Resolved → Pending
+```
 
-Each history record stores:
+A ticket cannot move from `Pending` to `InProgress` without an assigned operator.
 
-- Ticket identifier.
-- Previous status.
-- New status.
-- Optional comment.
-- Creation date.
+A ticket cannot move from `InProgress` to `Resolved` without a diagnosis.
 
-Status updates and history registration are executed through the MySQL stored procedure:
+These validations are implemented in the service layer instead of the controller.
+
+---
+
+# Ticket History
+
+Every valid ticket status transition generates a history record.
+
+Example:
+
+```text
+Ticket 1
+Pending → InProgress
+Comment: The equipment is being inspected.
+```
+
+Then:
+
+```text
+Ticket 1
+InProgress → Resolved
+Comment: The incident was corrected.
+```
+
+The relationship is:
+
+```text
+Ticket 1 ───── N TicketHistory
+```
+
+The status update and history creation are executed through the MySQL stored procedure:
 
 ```text
 sp_change_ticket_status
 ```
 
-The stored procedure performs the ticket update and history insertion inside the same transaction.
+The procedure performs the ticket update and history insertion inside a database transaction.
+
+---
+
+# Error Handling
+
+Expected business errors return controlled responses instead of generic server errors.
+
+Examples include:
+
+### Ticket not found
+
+```text
+404 Not Found
+```
+
+### Invalid status transition
+
+```text
+400 Bad Request
+```
+
+### Missing assigned operator
+
+```text
+400 Bad Request
+```
+
+Example message:
+
+```text
+An operator is required to start progress.
+```
+
+### Missing diagnosis
+
+```text
+400 Bad Request
+```
+
+Example message:
+
+```text
+A diagnosis is required to resolve the ticket.
+```
+
+---
+
+# Bonus Features
+
+The application also includes:
+
+- Ticket assignment to operators.
+- Ticket filtering by status.
+- Ticket filtering by creation date.
+- Simulated frontend notifications after successful status changes.

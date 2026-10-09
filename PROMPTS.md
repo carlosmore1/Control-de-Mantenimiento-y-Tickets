@@ -87,3 +87,6 @@ Help me create the README for the project. It should explain what the applicatio
 
 Prompt 30
 The application is already deployed and working on Railway. Help me update the README with the public frontend and backend URLs, the production architecture, Docker and Nginx configuration, Railway deployment information, environment variables, and the final project status.
+
+Prompt 31
+I have the main ticket application working and I want to add the optional bonus features without changing the existing workflow too much. How can I add ticket filters by status and created date, show a simple notification when a ticket changes status, and assign an operator before moving a ticket from Pending to In Progress?

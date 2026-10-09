@@ -1,45 +1,106 @@
 # Sequence Diagrams
 
-## Create Ticket
+## Ticket Creation
 
 ```mermaid
 sequenceDiagram
     actor User
-    participant Frontend as Angular Frontend
-    participant API as ASP.NET Core API
-    participant DB as MySQL Database
+    participant Frontend
+    participant API
+    participant TicketService
+    participant Database
 
-    User->>Frontend: Complete ticket form
+    User->>Frontend: Enter ticket information
+    User->>Frontend: Create Ticket
+
     Frontend->>API: POST /api/tickets
-    API->>API: Validate ticket data
-    API->>DB: Create ticket
-    DB-->>API: Ticket created
-    API-->>Frontend: Return created ticket
-    Frontend-->>User: Show ticket in Pending status
+    API->>TicketService: Create ticket request
+
+    TicketService->>Database: Insert Ticket with Pending status
+    Database-->>TicketService: Ticket created
+
+    TicketService-->>API: TicketResponse
+    API-->>Frontend: Created ticket
+
+    Frontend-->>User: Display ticket in Pending column
 ```
 
-## Change Ticket Status
+## Ticket Status Transition
 
 ```mermaid
 sequenceDiagram
     actor Operator
-    participant Frontend as Angular Frontend
-    participant API as ASP.NET Core API
-    participant DB as MySQL Database
+    participant Frontend
+    participant API
+    participant TicketService
+    participant StoredProcedure
+    participant Database
 
-    Operator->>Frontend: Request status change
+    Operator->>Frontend: Select assigned operator
+    Operator->>Frontend: Start Progress
+
     Frontend->>API: PUT /api/tickets/{id}/status
-    API->>API: Validate state transition
+    API->>TicketService: Change status request
 
-    alt Valid transition
-        API->>DB: Execute status transition stored procedure
-        DB->>DB: Update Ticket status
-        DB->>DB: Insert TicketHistory record
-        DB-->>API: Transition completed
-        API-->>Frontend: Return updated ticket
-        Frontend-->>Operator: Show new status
-    else Invalid transition
-        API-->>Frontend: Return validation error
-        Frontend-->>Operator: Show error message
-    end
+    TicketService->>TicketService: Validate transition
+    TicketService->>TicketService: Validate assigned operator
+
+    TicketService->>StoredProcedure: Change Pending to InProgress
+    StoredProcedure->>Database: Update Ticket status and operator
+    StoredProcedure->>Database: Insert TicketHistory
+    Database-->>StoredProcedure: Transaction completed
+
+    StoredProcedure-->>TicketService: Success
+    TicketService-->>API: Updated TicketResponse
+    API-->>Frontend: Updated ticket
+
+    Frontend-->>Operator: Move ticket to In Progress
+    Frontend-->>Operator: Show status notification
+```
+
+## Ticket Resolution
+
+```mermaid
+sequenceDiagram
+    actor Operator
+    participant Frontend
+    participant API
+    participant TicketService
+    participant StoredProcedure
+    participant Database
+
+    Operator->>Frontend: Enter diagnosis
+    Operator->>Frontend: Resolve Ticket
+
+    Frontend->>API: PUT /api/tickets/{id}/status
+    API->>TicketService: Change status request
+
+    TicketService->>TicketService: Validate transition
+    TicketService->>TicketService: Validate diagnosis
+
+    TicketService->>StoredProcedure: Change InProgress to Resolved
+    StoredProcedure->>Database: Update Ticket and diagnosis
+    StoredProcedure->>Database: Insert TicketHistory
+    Database-->>StoredProcedure: Transaction completed
+
+    StoredProcedure-->>TicketService: Success
+    TicketService-->>API: Updated TicketResponse
+    API-->>Frontend: Updated ticket
+
+    Frontend-->>Operator: Move ticket to Resolved
+    Frontend-->>Operator: Show status notification
+```
+
+## Status Flow
+
+```text
+Pending
+   |
+   | Assigned operator required
+   v
+InProgress
+   |
+   | Diagnosis required
+   v
+Resolved
 ```
